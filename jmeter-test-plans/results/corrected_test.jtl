@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1777294095988,697,Simple Login Request,200,,Simple Login Test 1-1,text,true,,819,226,1,1,http://localhost:8080/api/auth/login,692,0,22

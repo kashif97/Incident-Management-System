@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="IMS Load Test - High Volume" enabled="true">
+      <stringProp name="TestPlan.comments">High volume load testing for IMS Backend</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="BASE_URL" elementType="Argument">
+            <stringProp name="Argument.name">BASE_URL</stringProp>
+            <stringProp name="Argument.value">http://localhost:8080</stringProp>
+          </elementProp>
+          <elementProp name="ADMIN_USERNAME" elementType="Argument">
+            <stringProp name="Argument.name">ADMIN_USERNAME</stringProp>
+            <stringProp name="Argument.value">admin</stringProp>
+          </elementProp>
+          <elementProp name="ADMIN_PASSWORD" elementType="Argument">
+            <stringProp name="Argument.name">ADMIN_PASSWORD</stringProp>
+            <stringProp name="Argument.value">Admin@123</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Heavy Load - Login and Create Incidents" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">200</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">100</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">30</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="username" elementType="Argument">
+                <stringProp name="Argument.name">username</stringProp>
+                <stringProp name="Argument.value">${ADMIN_USERNAME}</stringProp>
+              </elementProp>
+              <elementProp name="password" elementType="Argument">
+                <stringProp name="Argument.name">password</stringProp>
+                <stringProp name="Argument.value">${ADMIN_PASSWORD}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <stringProp name="HTTPSampler.path">/api/auth/login</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract JWT Token" enabled="true">
+            <stringProp name="JSONPostProcessor.referenceNames">jwt_token</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.data.token</stringProp>
+            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+            <stringProp name="JSONPostProcessor.defaultValues">NOT_FOUND</stringProp>
+          </JSONPostProcessor>
+          <hashTree/>
+        </hashTree>
+        
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Incident" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="Argument">
+                <stringProp name="Argument.name">title</stringProp>
+                <stringProp name="Argument.value">Load Test Incident ${__threadNum}-${__iteration}</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Argument">
+                <stringProp name="Argument.name">description</stringProp>
+                <stringProp name="Argument.value">High volume load test incident created by thread ${__threadNum} on iteration ${__iteration}</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Argument">
+                <stringProp name="Argument.name">priority</stringProp>
+                <stringProp name="Argument.value">${__choose(HIGH,MEDIUM,LOW,CRITICAL,)}</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Argument">
+                <stringProp name="Argument.name">categoryId</stringProp>
+                <stringProp name="Argument.value">${__Random(1,10)}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <stringProp name="HTTPSampler.path">/api/incidents</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${jwt_token}</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+        </hashTree>
+        
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Uniform Random Timer" enabled="true">
+          <stringProp name="ConstantTimer.delay">1000</stringProp>
+          <stringProp name="RandomTimer.range">2000</stringProp>
+        </UniformRandomTimer>
+        <hashTree/>
+      </hashTree>
+      
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Concurrent Read Operations" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">500</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">50</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">15</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Incidents List" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="page" elementType="Argument">
+                <stringProp name="Argument.name">page</stringProp>
+                <stringProp name="Argument.value">${__Random(0,5)}</stringProp>
+              </elementProp>
+              <elementProp name="size" elementType="Argument">
+                <stringProp name="Argument.name">size</stringProp>
+                <stringProp name="Argument.value">${__choose(10,20,50,)}</stringProp>
+              </elementProp>
+              <elementProp name="search" elementType="Argument">
+                <stringProp name="Argument.name">search</stringProp>
+                <stringProp name="Argument.value">${__choose(test,incident,issue,problem,,)}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <stringProp name="HTTPSampler.path">/api/incidents</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${jwt_token}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+        </hashTree>
+        
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Dashboard KPIs" enabled="true">
+          <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <stringProp name="HTTPSampler.path">/api/incidents/dashboard/kpi</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${jwt_token}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+        </hashTree>
+        
+        <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
+          <stringProp name="ConstantTimer.delay">500</stringProp>
+          <stringProp name="RandomTimer.range">1500</stringProp>
+        </GaussianRandomTimer>
+        <hashTree/>
+      </hashTree>
+      
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp name="ResultCollector.successful_logging_enabled">
+          <name>ResultCollector.successful_logging_enabled</name>
+          <value>success_only</value>
+        </objProp>
+        <objProp name="ResultCollector.sample_logger">
+          <name>ResultCollector.sample_logger</name>
+          <value>sample</value>
+        </objProp>
+        <boolProp name="ResultCollector.enabled">true</boolProp>
+        <boolProp name="ResultCollector.start_to_end">true</boolProp>
+        <stringProp name="ResultCollector.filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp name="ResultCollector.successful_logging_enabled">
+          <name>ResultCollector.successful_logging_enabled</name>
+          <value>success_only</value>
+        </objProp>
+        <objProp name="ResultCollector.sample_logger">
+          <name>ResultCollector.sample_logger</name>
+          <value>sample</value>
+        </objProp>
+        <boolProp name="ResultCollector.enabled">true</boolProp>
+        <boolProp name="ResultCollector.start_to_end">true</boolProp>
+        <stringProp name="ResultCollector.filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      
+      <ResultCollector guiclass="StatGraphVisualizer" testclass="ResultCollector" testname="Aggregate Graph" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp name="ResultCollector.successful_logging_enabled">
+          <name>ResultCollector.successful_logging_enabled</name>
+          <value>success_only</value>
+        </objProp>
+        <objProp name="ResultCollector.sample_logger">
+          <name>ResultCollector.sample_logger</name>
+          <value>sample</value>
+        </objProp>
+        <boolProp name="ResultCollector.enabled">true</boolProp>
+        <boolProp name="ResultCollector.start_to_end">true</boolProp>
+        <stringProp name="ResultCollector.filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
