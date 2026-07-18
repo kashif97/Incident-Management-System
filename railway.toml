@@ -1,0 +1,17 @@
+[build]
+builder = "NIXPACKS"
+
+[build.env]
+NPM_FLAGS = "--legacy-peer-deps"
+
+[[services]]
+name = "backend"
+path = "IMS-Backend"
+command = "mvn spring-boot:run"
+env = ["PORT=8080"]
+
+[[services]]
+name = "frontend"
+path = "IMS-Frontend"
+command = "npm start"
+env = ["PORT=3000"]
