@@ -1,83 +1,71 @@
-﻿# Incident-Management-System
-# 🛠️ Incident Management System (IMS)
+﻿# 🚨 Incident Management System
 
-A professional, full-stack Enterprise Support platform designed to automate IT service desk workflows, track Service Level Agreements (SLAs), and ensure organizational accountability.
+A full-stack web application for tracking and managing technical incidents with role-based access control and SLA monitoring.
 
----
+## ✨ Features
 
-## 🌟 Project Overview
-This IMS provides a centralized hub for reporting, tracking, and resolving technical issues. It implements **Complex Business Logic**, including automated SLA breach detection, role-based workflows, and a secure audit trail.
+- 🔐 **User Authentication** - Secure login with JWT tokens
+- 👥 **Role-Based Access** - Three user roles: Reporter, Resolver, Manager
+- 📋 **Incident Management** - Create, update, and track incidents
+- ⏱️ **SLA Tracking** - Monitor response and resolution time limits
+- 📝 **Audit Logging** - Track all system activities
 
-### **Current Status: 90% Completed**
-- [x] JWT-based Authentication & Role-Based Access Control (RBAC)
-- [x] Full CRUD operations for Incident lifecycle
-- [x] SLA Logic Engine (Response & Resolution tracking)
-- [x] Audit Logging for all system actions
-- [ ] Final UI Polish & Analytics Charts (In Progress)
+## 🛠️ Tech Stack
 
----
+- ⚛️ **Frontend:** React.js
+- ☕ **Backend:** Java Spring Boot
+- 🗄️ **Database:** MySQL
+- 🔒 **Security:** JWT Authentication
 
-## 🏗️ Architecture & Tech Stack
+## 👤 User Roles
 
-The system follows a modern decoupled architecture, ensuring a clean separation between the business logic and the user interface.
+| Role | Permissions |
+|------|-------------|
+| 📢 Reporter | Create incidents, view own tickets |
+| 🔧 Resolver | Assign tickets, update status, add notes |
+| 👨‍💼 Manager | View all tickets, reassign, access audit logs |
 
-- **Frontend:** React.js (Hooks, Context API, Axios)
-- **Backend:** Java 17, Spring Boot, Spring Security
-- **Database:** MySQL (Relational persistence)
-- **Security:** JWT (JSON Web Tokens) & BCrypt Password Hashing
-- **API Testing:** Postman
+## 📦 Installation
 
----
+### Prerequisites
+- ☕ Java 17
+- 📦 Node.js & npm
+- 🗄️ MySQL
 
-## 🔐 Role-Based Access Control (RBAC)
+### Setup
 
-Access is strictly governed by user roles. The system validates the `role_code` on every API request.
-
-| Role | Key Permissions |
-| :--- | :--- |
-| **Reporter** | Raise new incidents, track personal tickets, and provide updates. |
-| **Resolver** | Claim/Assign tickets, update status (In Progress/Resolved), and manage technical notes. |
-| **Manager** | Full system visibility, reassign tickets, monitor SLA breaches, and access Audit Logs. |
-
----
-
-## ⏲️ SLA Logic Engine
-
-A standout feature of this project is the custom-built SLA engine that calculates deadlines based on priority levels:
-- **Response SLA:** Ensures the team acknowledges an incident within the required time.
-- **Resolution SLA:** Tracks the total time taken to move a ticket to a "Resolved" state.
-- **Automated Breaches:** Utilizes JPA lifecycle hooks (`@PrePersist`) to ensure data integrity and prevent `null` constraints during automated flag updates.
-
----
-
-## 🚀 Technical Challenges Overcome
-
-### 1. Handling Type Mismatches (Instant vs LocalDateTime)
-**Challenge:** The database stored audit logs in `Instant` (UTC), but the frontend required `LocalDateTime` in IST for Indian users.
-**Solution:** Implemented a robust conversion layer in the DTO (Data Transfer Object) using `ZoneId.of("Asia/Kolkata")` to ensure accurate local reporting.
-
-### 2. Database Constraint Integrity
-**Challenge:** Encountered `Column 'resolution_breached' cannot be null` errors during API testing when fields were not explicitly sent.
-**Solution:** Fixed by using `@Builder.Default` in Lombok and `@PrePersist` methods in the Entity layer to ensure all boolean flags are initialized to `false` automatically.
-
----
-
-## 🛠️ Installation & Local Setup
-
-1. **Clone the repository:**
+1. **Clone the repository**
    ```bash
-   git clone [https://github.com/harishankar004/ims-project.git](https://github.com/harishankar004/ims-project.git)
-2. Backend (Spring Boot):
+   git clone https://github.com/kashif97/Incident-Management-System.git
+   cd Incident-Management-System-main
+   ```
 
-Import as a Maven project in IntelliJ.
+2. **Backend Setup**
+   - Open `IMS-Backend` in IntelliJ IDEA
+   - Update MySQL credentials in `src/main/resources/application.properties`
+   - Run the Spring Boot application
 
-Update src/main/resources/application.properties with your MySQL credentials.
+3. **Frontend Setup**
+   ```bash
+   cd IMS-Frontend
+   npm install
+   npm start
+   ```
+   The app will run on `http://localhost:3000`
 
-Run the application.
-3. Frontend (React):
+## 📁 Project Structure
 
-Navigate to the IMS-Frontend folder.
+```
+Incident-Management-System-main/
+├── IMS-Backend/          # Spring Boot backend
+├── IMS-Frontend/         # React frontend
+├── jmeter-test-plans/    # Performance testing
+└── README.md
+```
 
-Run npm install to install dependencies.
+## 📊 Current Status
 
-Run npm start to launch the dev server on localhost:3000.
+- ✅ Authentication & Authorization
+- ✅ Incident CRUD Operations
+- ✅ SLA Monitoring
+- ✅ Audit Logging
