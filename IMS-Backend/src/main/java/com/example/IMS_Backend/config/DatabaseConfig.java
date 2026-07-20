@@ -15,9 +15,9 @@ public class DatabaseConfig {
     public DataSource dataSource() {
         String databaseUrl = System.getenv("DATABASE_URL");
         
-        if (databaseUrl != null && databaseUrl.startsWith("postgresql://")) {
-            // Convert Render's postgresql:// format to jdbc:postgresql:// format
-            String jdbcUrl = databaseUrl.replace("postgresql://", "jdbc:postgresql://");
+        if (databaseUrl != null && (databaseUrl.startsWith("postgresql://") || databaseUrl.startsWith("postgres://"))) {
+            // Convert Render's postgres:// or postgresql:// format to jdbc:postgresql:// format
+            String jdbcUrl = databaseUrl.replaceFirst("postgres(?:ql)?://", "jdbc:postgresql://");
             
             // Check if port is missing and add default port 5432
             // Pattern: jdbc:postgresql://user:pass@host/database (missing port)
