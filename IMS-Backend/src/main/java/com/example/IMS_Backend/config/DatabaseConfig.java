@@ -19,6 +19,18 @@ public class DatabaseConfig {
             // Convert Render's postgresql:// format to jdbc:postgresql:// format
             String jdbcUrl = databaseUrl.replace("postgresql://", "jdbc:postgresql://");
             
+            // Check if port is missing and add default port 5432
+            // Pattern: jdbc:postgresql://user:pass@host/database (missing port)
+            // Should be: jdbc:postgresql://user:pass@host:5432/database
+            if (!jdbcUrl.matches(".*:\\d+/.*")) {
+                // Insert :5432 before the database name
+                int lastSlashIndex = jdbcUrl.lastIndexOf('/');
+                if (lastSlashIndex > 0) {
+                    jdbcUrl = jdbcUrl.substring(0, lastSlashIndex) + ":5432" + jdbcUrl.substring(lastSlashIndex);
+                    System.out.println("Added default port 5432 to JDBC URL");
+                }
+            }
+            
             // Log the URL for debugging (remove in production)
             System.out.println("DATABASE_URL found, converting to JDBC format");
             System.out.println("JDBC URL: " + jdbcUrl);
