@@ -1,10 +1,10 @@
 services:
   - type: web
     name: ims-frontend
-    env: static
+    env: node
     plan: free
     buildCommand: npm install && npm run build
-    staticPublishPath: build
+    startCommand: npm install -g serve && serve -s build -l 8080
     envVars:
       - key: REACT_APP_API_URL
         value: https://ims-backend-uik9.onrender.com
