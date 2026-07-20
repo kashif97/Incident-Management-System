@@ -7,4 +7,4 @@ services:
     staticPublishPath: build
     envVars:
       - key: REACT_APP_API_URL
-        value: https://ims-backend.onrender.com
+        value: https://ims-backend-uik9.onrender.com
